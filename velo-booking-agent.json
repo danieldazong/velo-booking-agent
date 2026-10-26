@@ -1,0 +1,171 @@
+{
+  "name": "Velo - Your Automated Booking-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Current Date & Time: {{ $now }}\nCurrent Timezone: {{ $now.zoneName }}\n\nYou are the Nouvrix AI Scheduler. Your ONLY job is to book strategy sessions using the Google Calendar tool.\n\nYOUR BOOKING CHECKLIST:\n1. Topic\n2. Start Date & Time\n3. End Date & Time (Default to 30 mins if not specified)\n4. User's Email Address (Required for the calendar invite)\n\nAGENT INSTRUCTIONS:\n- Evaluate the user's input against your checklist. \n- If ANY information is missing (especially the email), do NOT call the tool. Instead, ask the user a natural, conversational question to get the missing detail.\n- If ALL information is present, YOU MUST IMMEDIATELY CALL THE GOOGLE CALENDAR TOOL. \n\nLINK FORMATTING RULE:\n- When the tool successfully creates the meeting, it will return a Google Meet video link. \n- You MUST output this link as plain, raw text (e.g. https://meet.google.com/abc-defg-hij). \n- NEVER wrap the link in Markdown brackets or parentheses. \n\nHANDLING DECLINES / NON-BOOKINGS:\n- If the user explicitly states they do not want to set up a meeting, reply: \"No problem! If you would rather just pass a message to the Nouvrix team, you can reach out directly at support@nouvrix.com.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -208,
+        32
+      ],
+      "id": "14d638e3-328d-4bee-8fd0-80fe66dfe577",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -496,
+        32
+      ],
+      "id": "8aaa25b2-bf2c-4ff1-aaf2-01bc7d3f1c2b",
+      "name": "When chat message received",
+      "webhookId": "af051551-44d5-4444-9854-dbff33c6a66e"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        240
+      ],
+      "id": "c1c3b491-66a0-4797-897d-6ebdcd7bfae1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        240
+      ],
+      "id": "7a285111-5fb3-4ae8-9522-f7b7aa91becc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "global.nouvrix@gmail.com",
+          "mode": "list",
+          "cachedResultName": "global.nouvrix@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', `The exact start date and time in ISO-8601 format (e.g., 2026-10-20T09:00:00Z). Calculate based on the current date.`, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', `The exact end date and time in ISO-8601 format.`, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('attendees0_Attendees', `The user's email address.`, 'string') }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `The topic of the meeting.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        240
+      ],
+      "id": "9a88b751-dd57-4c0f-bcaf-ef0e9ce3b730",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Ucx0B5e6qcuKwPoV",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b93a69e9-5f92-45aa-a4d1-81a517443b65",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e1bdeb32b9f3218944a0135bb7df4864820714155dfba95d22b7ca313ab22666"
+  },
+  "nodeGroups": [],
+  "id": "UnCzzss9as9YJe89",
+  "tags": []
+}

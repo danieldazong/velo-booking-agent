@@ -1,10 +1,5 @@
 {
-  "topics": [
-    {
-      "idea": "The Empathy Paradox: Why 'Flawed' AI Builds Better Workflows"
-    },
-    {
-      "idea": "Cognitive Offloading: How Automation Rewires Brain Chemistry"
-    }
-  ]
+  "action": "sendMessage",
+  "sessionId": "session_abc123xyz",
+  "chatInput": "I want to book a strategy session tomorrow at 9am to discuss AI automation. My email is daniel@nouvrix.com"
 }
